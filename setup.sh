@@ -23,13 +23,15 @@ sudo apt update -y
 sudo apt upgrade -y
 sudo apt install samba -y
 
-# Configure Samba
-sudo nano /etc/samba/smb.conf << EOF
+# Configure Samba: Append [shared] block to the end of smb.conf
+cat <<EOL | sudo tee -a /etc/samba/smb.conf
+
 [shared]
 path = $shared_folder_path
 read only = no
 guest ok = yes
-EOF
+EOL
+
 
 # Add user to Samba
 sudo smbpasswd -a $samba_username
@@ -48,6 +50,7 @@ sudo systemctl start plexmediaserver
 sudo systemctl enable plexmediaserver
 
 # Fix ownership issues with the shared directory
+sudo chmod -R 755 "$HOME"
 sudo chmod -R 755 "$shared_folder_path"
 sudo systemctl restart plexmediaserver
 
